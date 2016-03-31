@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>在线尝试 Bootstrap 实例</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="http://apps.bdimg.com/libs/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet">
+        <script src="http://apps.bdimg.com/libs/jquery/2.0.0/jquery.min.js"></script>
+        <script src="http://apps.bdimg.com/libs/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+        
+        <style>
+             table tr td:first-child{color:blue;width:5%}
+             table tr td:nth-child(2){color:blue;width:10%}
+        </style>
+        
+        <script>
+            //1，复制粘贴时。2，不在结尾回车时
+
+            row='<tr>'
+            row+='<td class="row_num"></td>'
+            row+='<td class="tag"></td>'
+            row+='<td class="inputer"></td>'
+            row+='</tr>'
+
+        
+            ///////////////////////////////////////////////////////////////////
+            // every time flush table,make it editable,and add row number.
+            function edit_able(){
+                $("#editer tr td.inputer").attr("contenteditable","true");
+            }
+
+            function row_num(){
+                editer=$("#editer").get(0)
+                max_num=editer.rows.length
+
+                for(var i=0;i<max_num;i++){
+                    td=$("td.row_num:eq("+i+")")
+                    td.text(i+1)
+                }
+            }
+
+            function flush_table(){
+                edit_able()
+                row_num()
+            }
+
+            ///////////////////////////////////////////////////////////////////
+            // init table,add tr and td into table.
+            function init_table(){
+                for(var i=0;i<3;i++){
+                    $("#editer tbody").append(row)
+                }
+                flush_table()
+            }
+            
+            function after_row(tr){
+                tr.after(row)
+                flush_table()
+            }
+            
+            function delete_row(tr){
+                tr.remove()
+                flush_table()
+            }
+            
+            function keydown_enter(td){
+                
+                segments=td.html().split('<br><br>')
+                if(segments.length == 1){
+                    return
+                }
+
+                //接一个循环，在后面创建对应的row，并分配对应的内容。
+                console.log(segments.length)
+                for(segment in segments){
+                    after_row(td.parent())
+                    new_row = td.parent().next()
+                    //new_td = $(new_row "td:last-child")
+                }
+            }
+        
+            $(document).ready(function(){
+                init_table()
+            
+                $("td").keydown(function(){
+                
+                    switch(event.which){
+                        case 13:
+                            if(event.ctrlKey){console.log('c e')}
+                            keydown_enter($(this))
+                            break;
+                        case 8:
+                            console.log("backspace")
+                            break;
+                        case 9:
+                            //抽成方法
+                            console.log("tab")
+                            position = window.getSelection().anchorOffset
+                            tag=$(this).text().substr(0,position)
+                            content=$(this).text().substr(position)
+                            $(this).prev().text(tag)
+                            $(this).text(content)
+                            if (event.preventDefault) {event.preventDefault(); }
+                            else { event.returnValue = false; }
+                            break;
+                        default:
+                            console.log("else is "+event.which)
+                            break;
+                    }
+                    
+                });
+                
+            });
+            
+        </script>
+        
+    </head>
+    <body>
+        <h1>Hello,d world!</h1>
+        
+        <div class="container">
+        
+            <div class="row">
+            
+                <div class="col-md-2">
+                    <textarea class="form-control" rows="20"></textarea>
+                </div>
+                
+                <div class="col-md-8">
+                    <table id="editer" class="table table-bordered table-condensed table-striped table-hover">
+                    <tbody></tbody>
+                    </table>
+                </div>
+                
+                <div class="col-md-2">
+                    <textarea class="form-control" rows="20"></textarea>
+                </div>
+                
+            </div>
+        
+        </div>
+        
+    </body>
+</html>

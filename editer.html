@@ -25,7 +25,7 @@
             ///////////////////////////////////////////////////////////////////
             // every time flush table,make it editable,and add row number.
             function edit_able(){
-                $("#editer tr td.inputer").attr("contenteditable","true");
+                $(".inputer").attr("contenteditable","true");
             }
 
             function row_num(){
@@ -38,9 +38,14 @@
                 }
             }
 
+            function keydown_register(){
+                $(".inputer").keydown(keydown_switch)
+            }
+            
             function flush_table(){
                 edit_able()
                 row_num()
+                keydown_register()
             }
 
             ///////////////////////////////////////////////////////////////////
@@ -56,56 +61,73 @@
                 tr.after(row)
                 flush_table()
             }
-            
+
             function delete_row(tr){
                 tr.remove()
                 flush_table()
             }
             
+            ///////////////////////////////////////////////////////////////////
+            // how to act when the keydown
+
+            function keydown_switch(){
+                switch(event.which){
+                    case 13:
+                        if(event.ctrlKey){console.log('c e')}
+                        keydown_enter($(this))
+                        break;
+                    case 8:
+                        console.log("backspace")
+                        break;
+                    case 9:
+                        keydown_tab($(this))
+                        break;
+                    default:
+                        console.log("else is "+event.which)
+                        break;
+                }
+            }
+
             function keydown_enter(td){
-                
-                segments=td.html().split('<br><br>')
+                /*
+                segments=td.html().split('<br>')
                 if(segments.length == 1){
                     return
                 }
 
-                //接一个循环，在后面创建对应的row，并分配对应的内容。
                 console.log(segments.length)
                 for(segment in segments){
+                */
                     after_row(td.parent())
                     new_row = td.parent().next()
-                    //new_td = $(new_row "td:last-child")
-                }
+                    new_td = new_row.children("td.inputer")
+                    new_td.focus()
+                if (event.preventDefault) {event.preventDefault(); }
+                else { event.returnValue = false; }
+                //}
             }
         
+            function keydown_tab(td){
+                console.log(td.html())
+
+                position = window.getSelection().anchorOffset
+                tag=td.html().substr(0,position)
+                content=td.html().substr(position)
+
+                td.prev().html(tag)
+                td.html(content)
+
+                if (event.preventDefault) {event.preventDefault(); }
+                else { event.returnValue = false; }
+            }
+
+            ///////////////////////////////////////////////////////////////////
+            // at begin
             $(document).ready(function(){
                 init_table()
             
                 $("td").keydown(function(){
                 
-                    switch(event.which){
-                        case 13:
-                            if(event.ctrlKey){console.log('c e')}
-                            keydown_enter($(this))
-                            break;
-                        case 8:
-                            console.log("backspace")
-                            break;
-                        case 9:
-                            //抽成方法
-                            console.log("tab")
-                            position = window.getSelection().anchorOffset
-                            tag=$(this).text().substr(0,position)
-                            content=$(this).text().substr(position)
-                            $(this).prev().text(tag)
-                            $(this).text(content)
-                            if (event.preventDefault) {event.preventDefault(); }
-                            else { event.returnValue = false; }
-                            break;
-                        default:
-                            console.log("else is "+event.which)
-                            break;
-                    }
                     
                 });
                 
